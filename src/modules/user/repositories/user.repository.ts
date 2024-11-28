@@ -23,5 +23,18 @@ export class UserRepository {
     async deleteUser(id: string): Promise<IUser | null> {
         return UserModel.findByIdAndDelete(id);
     }
-    
+
+    async getAverageAgeByCity(minAge: number): Promise<any> {
+        return UserModel.aggregate([
+            { $match: { age: { $gte: minAge } } }, 
+            {
+                $group: {
+                    _id: "$city",
+                    averageAge: { $avg: "$age" }, 
+                    totalUsers: { $sum: 1 }, 
+                },
+            },
+            { $sort: { averageAge: -1 } },
+        ]);
+    }
 }

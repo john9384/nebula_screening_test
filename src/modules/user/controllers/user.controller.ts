@@ -61,4 +61,15 @@ export class UserController {
             res.status(404).json({ message: error.message });
         }
     };
+
+    getAverageAgeByCity = async (req: Request, res: Response) => {
+        const { minAge = 0 } = req.query;
+    
+        try {
+            const results = await this.userService.getAverageAgeByCity(parseInt(minAge as string));
+            res.status(200).json({ results });
+        } catch (error: any) {
+            res.status(500).json({ message: "Failed to fetch data", error: error.message });
+        }
+    };
 }

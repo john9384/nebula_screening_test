@@ -41,4 +41,11 @@ export class UserService {
         }
         return deletedUser;
     }
+
+    async getAverageAgeByCity(minAge: number) {
+        if (minAge < 0) {
+            throw new Error("Minimum age cannot be negative.");
+        }
+        return this.userRepository.getAverageAgeByCity(minAge);
+    }
 }
