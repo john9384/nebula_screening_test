@@ -1,34 +1,27 @@
-import { User } from "../types/user";
+import { UserModel } from "../models";
+import { IUser } from "../types/user";
 
-let users: User[] = []; // Temporary in-memory storage
 
 export class UserRepository {
-    getAllUsers(): User[] {
-        return users;
+    async getAllUsers(skip: number, limit: number, sortBy: string): Promise<IUser[]> {
+        return UserModel.find().sort({ [sortBy]: 1 }).skip(skip).limit(limit);
     }
 
-    getUserById(id: number): User | undefined {
-        return users.find((user) => user.id === id);
+    async getUserById(id: string): Promise<IUser | null> {
+        return UserModel.findById(id);
     }
 
-    createUser(user: User): User {
-        users.push(user);
-        return user;
+    async createUser(data: { name: string; email: string }): Promise<IUser> {
+        const newUser = new UserModel(data);
+        return newUser.save();
     }
 
-    updateUser(id: number, updatedData: Partial<User>): User | null {
-        const userIndex = users.findIndex((user) => user.id === id);
-        if (userIndex === -1) return null;
-
-        users[userIndex] = { ...users[userIndex], ...updatedData };
-        return users[userIndex];
+    async updateUser(id: string, updatedData: Partial<IUser>): Promise<IUser | null> {
+        return UserModel.findByIdAndUpdate(id, updatedData, { new: true });
     }
 
-    deleteUser(id: number): User | null {
-        const userIndex = users.findIndex((user) => user.id === id);
-        if (userIndex === -1) return null;
-
-        const [deletedUser] = users.splice(userIndex, 1);
-        return deletedUser;
+    async deleteUser(id: string): Promise<IUser | null> {
+        return UserModel.findByIdAndDelete(id);
     }
+    
 }

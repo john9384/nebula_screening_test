@@ -7,8 +7,10 @@ export class UserService {
         this.userRepository = new UserRepository();
     }
 
-    getAllUsers() {
-        return this.userRepository.getAllUsers();
+   
+     getAllUsers(page: number, pageSize: number, sortBy: string) {
+        const skip = (page - 1) * pageSize;
+        return this.userRepository.getAllUsers(skip, pageSize, sortBy);
     }
 
     getUserById(id: number) {

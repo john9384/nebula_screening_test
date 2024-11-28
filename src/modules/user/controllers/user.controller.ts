@@ -9,7 +9,13 @@ export class UserController {
     }
 
     async index(req: Request, res: Response) {
-        const users = this.userService.getAllUsers();
+        const { page = 1, pageSize = 10, sortBy = "createdAt" } = req.query;
+
+        const users = await this.userService.getAllUsers(
+            parseInt(page as string),
+            parseInt(pageSize as string),
+            sortBy as string
+        );
         res.status(200).json({ users });
     };
 
