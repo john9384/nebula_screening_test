@@ -1,11 +1,16 @@
-import { config } from "../config";
-import { userRoutes } from "../modules/user/routes";
-import {Router, Request, Response} from 'express'
+import { config } from '../config';
+import { userRoutes } from '../modules/user/routes';
+import { Router, Request, Response } from 'express';
 
 const router = Router();
 
-router.get('/', (_:Request, res: Response) => {
-  res.status(200).send({ msg: 'Nebula api running ' });
+router.get('/', (req: Request, res: Response) => {
+  res.send({
+    appName: config.appName,
+    status: 'Running',
+  });
 });
 
-router.use(`${config.apiPrefix}/user`, userRoutes);
+router.use(`${config.apiPrefix}/users`, userRoutes);
+
+export default router;

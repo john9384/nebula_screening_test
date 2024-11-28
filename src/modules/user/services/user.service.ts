@@ -1,5 +1,9 @@
+import { BadRequestError, NotFoundError } from '../../../library/helpers/errors';
+import { CreateUserDTO, UpdateUserDTO } from '../dtos';
 import { UserRepository } from '../repositories';
+import { IUser } from '../types/user';
 
+type IGetAllUsers = Partial<IUser> & { page?: number; pageSize?: number; sortBy?: string };
 export class UserService {
   private userRepository: UserRepository;
 
@@ -7,43 +11,46 @@ export class UserService {
     this.userRepository = new UserRepository();
   }
 
-  getAllUsers(page: number, pageSize: number, sortBy: string) {
-    const skip = (page - 1) * pageSize;
-    return this.userRepository.find(skip, pageSize, sortBy);
+  async getAllUsers({ page, pageSize, sortBy, ...params }: IGetAllUsers) {
+    return this.userRepository.find(params, { page, pageSize, sortBy });
   }
 
-  getUserById(id: number) {
-    const user = this.userRepository.getUserById(id);
+  async getOneUser(query: Partial<IUser>) {
+    const user = await this.userRepository.findOne(query);
+
     if (!user) {
-      throw new Error('User not found');
+      throw new NotFoundError('User not found');
     }
+
     return user;
   }
 
-  createUser(name: string, email: string) {
-    const newUser = { id: Date.now(), name, email };
-    return this.userRepository.createUser(newUser);
+  async createUser(user: CreateUserDTO) {
+    const existingUser = this.userRepository.findOne({email: user.email})
+    if(!existingUser) throw new BadRequestError("User exists")
+
+    return this.userRepository.create(user);
   }
 
-  updateUser(id: number, updatedData: { name?: string; email?: string }) {
-    const updatedUser = this.userRepository.updateUser(id, updatedData);
+  updateUser(query: Partial<IUser>, updatedData: UpdateUserDTO) {
+    const updatedUser = this.userRepository.update(query, updatedData);
     if (!updatedUser) {
-      throw new Error('User not found');
+      throw new NotFoundError('User not found');
     }
     return updatedUser;
   }
 
-  deleteUser(id: number) {
-    const deletedUser = this.userRepository.deleteUser(id);
+  deleteUser(query: Partial<IUser>) {
+    const deletedUser = this.userRepository.delete(query);
     if (!deletedUser) {
-      throw new Error('User not found');
+      throw new NotFoundError('User not found');
     }
     return deletedUser;
   }
 
   async getAverageAgeByCity(minAge: number) {
     if (minAge < 0) {
-      throw new Error('Minimum age cannot be negative.');
+      throw new BadRequestError('Minimum age cannot be negative.');
     }
     return this.userRepository.getAverageAgeByCity(minAge);
   }

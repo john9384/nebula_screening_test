@@ -1,11 +1,7 @@
-import { Model, Document, FilterQuery } from 'mongoose';
+import { Model, FilterQuery } from 'mongoose';
 import { ObjectId } from 'mongodb';
+import { IPagination } from './types';
 
-interface IPagination {
-  skip: number;
-  limit: number;
-  sortBy: string | number | symbol | any;
-}
 export class BaseRepository<T extends { [key: string]: any }> {
   private model: Model<T>;
 
@@ -14,13 +10,20 @@ export class BaseRepository<T extends { [key: string]: any }> {
   }
 
   async find(query: FilterQuery<T>, paginationOption?: IPagination): Promise<T[]> {
-    if (paginationOption) {
-      const { skip = 0, limit = 10, sortBy = 'createdAt' } = paginationOption;
+    if (paginationOption && (paginationOption.page || paginationOption.pageSize)) {
+      const { page = 1, pageSize = 10, sortBy } = paginationOption;
+      const skip = (page - 1) * Number(pageSize);
+      const limit = Number(pageSize);
+
       return this.model
         .find(query)
         .sort({ [sortBy]: 1 })
         .skip(skip)
         .limit(limit);
+    }
+
+    if (paginationOption && paginationOption.sortBy) {
+      return this.model.find(query).sort({ [paginationOption.sortBy]: 1 });
     }
 
     return this.model.find(query);

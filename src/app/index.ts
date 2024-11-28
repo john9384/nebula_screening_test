@@ -1,20 +1,18 @@
 import express, { Application, Request, Response } from 'express';
-import connectDB from '../database/connect';
-import globalErrorHandler from '../library/middleware/globalErrorHandler';
+import appRouter from './routes';
+import { NotFoundError } from '../library/helpers/errors';
+import globalErrorHandler from '../library/helpers/globalErrorHandler';
 
-function initializeApplication(): Application {
+export function applicationConfig(): Application {
   const app: Application = express();
-  const PORT = 3000;
 
-  connectDB();
-
+  // Middleware
   app.use(express.json());
-  app.use(globalErrorHandler);
 
-  // Root Route
-  app.get('/', (req: Request, res: Response) => {
-    res.send('Server is up and running!');
-  });
+  app.use('/', appRouter);
+  app.use((_req, _res, next) => next(new NotFoundError()));
+
+  app.use(globalErrorHandler);
 
   return app;
 }

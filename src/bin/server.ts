@@ -1,17 +1,23 @@
-import express, { Application, Request, Response } from 'express';
+import 'reflect-metadata';
+import { Application } from 'express';
+import { applicationConfig } from '../app';
+import { config } from '../config';
+import { connectDB } from '../database';
 
-const app: Application = express();
-const PORT = 3000;
+initializeServer()
+  .then(() => {
+    console.log(`====== ${config.appName} running on port ${config.appPort} ======`);
+  })
+  .catch((error: Error) => {
+    console.error(error);
+    throw error;
+  });
 
-// Middleware
-app.use(express.json());
+async function initializeServer(): Promise<void> {
+  const PORT = config.appPort || 3000;
+  const application: Application = applicationConfig();
 
-// Root Route
-app.get('/', (req: Request, res: Response) => {
-  res.send('Server is up and running!');
-});
+  await connectDB();
 
-// Start the server
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+  application.listen(PORT, '0.0.0.0', () => true);
+}

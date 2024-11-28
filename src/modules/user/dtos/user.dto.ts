@@ -1,30 +1,30 @@
-import { IsEmail, IsOptional, IsString, Length, IsInt, Min } from "class-validator";
+import { IsEmail, IsOptional, IsString, Length, IsInt, Min } from 'class-validator';
 
 export class CreateUserDTO {
-    @IsString()
-    @Length(3, 50)
-    name!: string;
+  @IsString({ message: 'Name must be a string.' })
+  @Length(3, 50, { message: 'Name must be between 3 and 50 characters long.' })
+  name: string;
 
-    @IsEmail()
-    email!: string;
+  @IsEmail({}, { message: 'Email must be a valid email address.' })
+  email: string;
 
-    @IsInt()
-    @Min(18)
-    age!: number;
+  @IsInt({ message: 'Age must be an integer.' })
+  @Min(1, { message: 'Age must be at least 1' })
+  age: number;
 }
 
 export class UpdateUserDTO {
-    @IsOptional()
-    @IsString()
-    @Length(3, 50)
-    name?: string;
+  @IsOptional()
+  @IsString({ message: 'Name must be a string.' })
+  @Length(3, 50, { message: 'Name must be between 3 and 50 characters long.' })
+  name?: string;
 
-    @IsOptional()
-    @IsEmail()
-    email?: string;
+  @IsOptional()
+  @IsEmail({}, { message: 'Email must be a valid email address.' })
+  email?: string;
 
-    @IsOptional()
-    @IsInt()
-    @Min(18)
-    age?: number;
+  @IsOptional()
+  @IsInt({ message: 'Age must be an integer.' })
+  @Min(18, { message: 'Age must be at least 18.' })
+  age?: number;
 }

@@ -1,1 +1,1 @@
-export {default as config} from './dev.config'
+export { default as config } from './dev.config';

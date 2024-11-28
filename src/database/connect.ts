@@ -1,11 +1,20 @@
 import mongoose from 'mongoose';
+import { config } from '../config';
+import { InternalServerError } from '../library/helpers/errors';
 
 const connectDB = async () => {
   try {
-    // TODO use env
-    const uri = 'mongodb://localhost:27017/nebula_test';
+    const uri = config.db.url;
+
+    if (!uri) {
+      throw new InternalServerError('Database URI not specified, check your env');
+    }
     await mongoose.connect(uri);
-    console.log('MongoDB connected successfully.');
+    console.log(`
+      ---------------------
+        Database Connected
+      ---------------------
+    `);
   } catch (error) {
     console.error('MongoDB connection error:', error);
     process.exit(1);
