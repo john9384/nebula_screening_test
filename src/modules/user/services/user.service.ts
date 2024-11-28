@@ -12,7 +12,8 @@ export class UserService {
   }
 
   async getAllUsers({ page, pageSize, sortBy, ...params }: IGetAllUsers) {
-    return this.userRepository.find(params, { page, pageSize, sortBy });
+    const users = await this.userRepository.find(params, { page, pageSize, sortBy });
+    return users.map(user => this.userRepository.serialize(user))
   }
 
   async getOneUser(query: Partial<IUser>) {
@@ -22,30 +23,32 @@ export class UserService {
       throw new NotFoundError('User not found');
     }
 
-    return user;
+    return this.userRepository.serialize(user);
   }
 
   async createUser(user: CreateUserDTO) {
-    const existingUser = this.userRepository.findOne({email: user.email})
-    if(!existingUser) throw new BadRequestError("User exists")
+    const existingUser = await this.userRepository.findOne({ email: user.email });
+    if (existingUser) throw new BadRequestError('User exists');
 
-    return this.userRepository.create(user);
+    const newUser =  await this.userRepository.create(user);
+
+    return this.userRepository.serialize(newUser)
   }
 
-  updateUser(query: Partial<IUser>, updatedData: UpdateUserDTO) {
-    const updatedUser = this.userRepository.update(query, updatedData);
+  async updateUser(query: Partial<IUser>, updatedData: UpdateUserDTO) {
+    const updatedUser = await this.userRepository.update(query, updatedData);
     if (!updatedUser) {
       throw new NotFoundError('User not found');
     }
-    return updatedUser;
+    return this.userRepository.serialize(updatedUser);
   }
 
-  deleteUser(query: Partial<IUser>) {
+  async deleteUser(query: Partial<IUser>) {
     const deletedUser = this.userRepository.delete(query);
     if (!deletedUser) {
       throw new NotFoundError('User not found');
     }
-    return deletedUser;
+    return {...query, deleted: true};
   }
 
   async getAverageAgeByCity(minAge: number) {

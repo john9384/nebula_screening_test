@@ -11,6 +11,10 @@ export class CreateUserDTO {
   @IsInt({ message: 'Age must be an integer.' })
   @Min(1, { message: 'Age must be at least 1' })
   age: number;
+
+  @IsString({ message: 'City must be a string.' })
+  @Length(3, 50, { message: 'Name must be between 3 and 50 characters long.' })
+  city: string;
 }
 
 export class UpdateUserDTO {
@@ -27,4 +31,9 @@ export class UpdateUserDTO {
   @IsInt({ message: 'Age must be an integer.' })
   @Min(18, { message: 'Age must be at least 18.' })
   age?: number;
+
+  @IsOptional()
+  @IsString({ message: 'City must be a string.' })
+  @Length(3, 50, { message: 'City must be between 3 and 50 characters long.' })
+  city?: string;
 }

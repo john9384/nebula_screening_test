@@ -15,13 +15,13 @@ export class UserController {
       pageSize: parseInt(pageSize as string),
     });
 
-    return new SuccessResponse('User fetched successfully', outcome).send(res); 
+    return new SuccessResponse('User fetched successfully', outcome).send(res);
   }
 
   async show(req: Request, res: Response) {
     const { id } = req.params;
     const outcome = await userService.getOneUser({ id });
-    return new SuccessResponse('User fetched successfully', outcome).send(res); 
+    return new SuccessResponse('User fetched successfully', outcome).send(res);
   }
 
   getAverageAgeByCity = async (req: Request, res: Response) => {
@@ -38,7 +38,7 @@ export class UserController {
   async update(req: Request, res: Response) {
     const { id } = req.params;
     const outcome = await userService.updateUser({ id }, req.body);
-    return new SuccessResponse('User updated successfully', outcome).send(res); 
+    return new SuccessResponse('User updated successfully', outcome).send(res);
   }
 
   async delete(req: Request, res: Response) {

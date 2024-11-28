@@ -21,4 +21,17 @@ export class UserRepository extends BaseRepository<IUser> {
       { $sort: { averageAge: -1 } },
     ]);
   }
+
+  public async serialize(user: IUser) {
+    console.log(">>>>>>>>user", user)
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      age: user.age,
+      city: user.city,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
+  }
 }

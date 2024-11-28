@@ -1,8 +1,8 @@
 import { Model, FilterQuery } from 'mongoose';
-import { ObjectId } from 'mongodb';
+import { Filter, ObjectId } from 'mongodb';
 import { IPagination } from './types';
 
-export class BaseRepository<T extends { [key: string]: any }> {
+export class BaseRepository<T> {
   private model: Model<T>;
 
   constructor(model: Model<T>) {
@@ -16,33 +16,45 @@ export class BaseRepository<T extends { [key: string]: any }> {
       const limit = Number(pageSize);
 
       return this.model
-        .find(query)
+        .find(this._serializeQuery(query))
         .sort({ [sortBy]: 1 })
         .skip(skip)
-        .limit(limit);
+        .limit(limit)
+        .lean() as unknown as  T[]
     }
 
     if (paginationOption && paginationOption.sortBy) {
-      return this.model.find(query).sort({ [paginationOption.sortBy]: 1 });
+      return this.model.find(this._serializeQuery(query)).sort({ [paginationOption.sortBy]: 1 }).lean() as unknown as  T[]
     }
 
-    return this.model.find(query);
+    return this.model.find(this._serializeQuery(query)).lean() as unknown as  T[]
   }
 
   async findOne(query: FilterQuery<T>): Promise<T | null> {
-    return this.model.findOne(query);
+    return this.model.findOne(this._serializeQuery(query));
   }
 
   async create(data: Partial<T>): Promise<T> {
-    const newItem = new this.model(data);
-    return newItem.save();
+    return this.model.create(data);
   }
 
   async update(query: FilterQuery<T>, data: Partial<T>): Promise<T | null> {
-    return this.model.findOneAndUpdate(query, data, { new: true });
+    return this.model.findOneAndUpdate(this._serializeQuery(query), data, { new: true });
   }
 
   async delete(query: FilterQuery<T>): Promise<T | null> {
-    return this.model.findOneAndDelete(query);
+    return this.model.findOneAndDelete(this._serializeQuery(query));
+  }
+
+  private _serializeQuery(query: FilterQuery<T>) {
+    const payload = { ...query }; 
+  
+    if (query.id) {
+      const _id = new ObjectId(query.id);
+      payload._id = _id;
+      delete payload.id;
+    }
+  
+    return payload;
   }
 }
