@@ -1,6 +1,7 @@
 import { BaseRepository } from '../../../database/BaseRepository';
 import { UserModel } from '../models';
 import { IUser } from '../types/user';
+import {Document } from 'mongoose'
 
 export class UserRepository extends BaseRepository<IUser> {
   constructor() {
@@ -22,8 +23,7 @@ export class UserRepository extends BaseRepository<IUser> {
     ]);
   }
 
-  public async serialize(user: IUser) {
-    console.log(">>>>>>>>user", user)
+  public  serialize(user: IUser) {
     return {
       id: user.id,
       name: user.name,

@@ -9,25 +9,25 @@ export class BaseRepository<T> {
     this.model = model;
   }
 
-  async find(query: FilterQuery<T>, paginationOption?: IPagination): Promise<T[]> {
+  async find(query: FilterQuery<T>, paginationOption?: IPagination): Promise<Array<T>> {
     if (paginationOption && (paginationOption.page || paginationOption.pageSize)) {
       const { page = 1, pageSize = 10, sortBy } = paginationOption;
       const skip = (page - 1) * Number(pageSize);
       const limit = Number(pageSize);
 
-      return this.model
+      return  this.model
         .find(this._serializeQuery(query))
         .sort({ [sortBy]: 1 })
         .skip(skip)
         .limit(limit)
-        .lean() as unknown as  T[]
+       
     }
 
     if (paginationOption && paginationOption.sortBy) {
-      return this.model.find(this._serializeQuery(query)).sort({ [paginationOption.sortBy]: 1 }).lean() as unknown as  T[]
+      return  this.model.find(this._serializeQuery(query)).sort({ [paginationOption.sortBy]: 1 })
     }
 
-    return this.model.find(this._serializeQuery(query)).lean() as unknown as  T[]
+    return  this.model.find(this._serializeQuery(query))
   }
 
   async findOne(query: FilterQuery<T>): Promise<T | null> {
